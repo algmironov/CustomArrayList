@@ -1,12 +1,15 @@
-package pro.sky;
+package pro.sky.stringList;
 
+import pro.sky.exceptions.IncorrectIndexException;
+import pro.sky.exceptions.ItemCannotBeNullException;
+import pro.sky.exceptions.ItemIsntInArrayException;
 import java.util.Arrays;
 
 public class CustomArrayList implements StringList {
 
-    private String[] customArray;
-    private int size;
     private final int STARTER_VOLUME = 10;
+    private String[] customArray ;
+    private int size;
 
     public CustomArrayList() {
         this.customArray  = new String[STARTER_VOLUME];
@@ -24,7 +27,7 @@ public class CustomArrayList implements StringList {
     }
 
     private void containsItem(String item) {
-        if (!Arrays.stream(customArray).equals(item)) {
+        if (indexOf(item) == - 1) {
             throw new ItemIsntInArrayException("There is no item in array!");
         }
     }
@@ -38,14 +41,14 @@ public class CustomArrayList implements StringList {
     @Override
     public String add(String item) {
         checkIfNull(item);
-        if (size == 0) {
-            customArray[0] = item;
-            size++;
-        }
         if (size == customArray.length - 1) {
             increaseCapacity();
         }
-        customArray[size] = item;
+        if (size == 0) {
+            customArray[0] = item;
+        } else {
+            customArray[size] = item;
+        }
         size++;
         return item;
     }
@@ -57,7 +60,7 @@ public class CustomArrayList implements StringList {
         if (size == customArray.length) {
             increaseCapacity();
         }
-        System.arraycopy(customArray, index, customArray, index + 1, (size - 1) - index);
+        System.arraycopy(customArray, index, customArray, index + 1, size - index);
 
         customArray[index] = item;
         size++;
@@ -77,40 +80,41 @@ public class CustomArrayList implements StringList {
     public String remove(String item) {
         checkIfNull(item);
         containsItem(item);
-        int targetIndex = 0;
-        for (int i = 0; i < customArray.length - 1; i++) {
-            if (customArray[i].equals(item)) {
-                targetIndex = i;
-            }
-        }
-        System.arraycopy(customArray, targetIndex + 1, customArray, targetIndex, (size - 1) - targetIndex);
+        int targetIndex = indexOf(item);
 
+        System.arraycopy(customArray, targetIndex + 1, customArray, targetIndex, size - targetIndex);
+        size--;
         return item;
     }
 
     @Override
     public String remove(int index) {
         indexIsInArray(index);
-        if (index == size - 1) {
-            customArray[index] = null;
-        } else {
-            System.arraycopy(customArray, index + 1, customArray, index, (size - 1) - index);
-        }
-        return null;
+        String removedItem = customArray[index];
+        System.arraycopy(customArray, index + 1, customArray, index, size - index);
+        size--;
+        return removedItem;
     }
 
     @Override
     public boolean contains(String item) {
+        boolean contains = true;
         checkIfNull(item);
-        return Arrays.stream(customArray).equals(item);
+        for (int i = 0; i < size - 1; i++) {
+            if (get(i).equals(item)) {
+                return contains;
+            } else{
+                contains = false;
+            }
+        }
+        return contains;
     }
 
 
 
     @Override
     public int indexOf(String item) {
-        int indexOf = 0;
-        containsItem(item);
+        int indexOf;
         for (int i = 0; i < customArray.length -1; i++) {
             if (customArray[i].equals(item)) {
                 indexOf = i;
@@ -133,13 +137,7 @@ public class CustomArrayList implements StringList {
     @Override
     public String get(int index) {
         indexIsInArray(index);
-        String targetItem = null;
-        for (int i = 0; i < customArray.length - 1; i++) {
-            if (i == index) {
-                targetItem = customArray[i];
-            }
-        }
-        return targetItem;
+        return customArray[index];
     }
 
     @Override
@@ -147,11 +145,12 @@ public class CustomArrayList implements StringList {
         if (otherList == null || otherList.size() != size) {
             return false;
         }
-        for (int i = 0; i <= size; i++) {
-            if (!customArray[i].equals(otherList.get(i))) {
+        for (int i = size - 1; i >= 0; i--) {
+            if (!get(i).equals(otherList.get(i))) {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -168,11 +167,25 @@ public class CustomArrayList implements StringList {
     @Override
     public void clear() {
         customArray = new String[STARTER_VOLUME];
+        size = 0;
 
     }
 
     @Override
     public String[] toArray() {
         return Arrays.copyOf(customArray, size);
+    }
+
+    @Override
+    public void printAll(){
+    for (int i = 0; i < size(); i++) {
+        System.out.print(get(i) + " ");
+        }
+        System.out.println();
+    }
+
+    @Override
+    public String[] getArray() {
+        return customArray;
     }
 }

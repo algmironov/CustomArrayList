@@ -1,4 +1,4 @@
-package pro.sky;
+package pro.sky.exceptions;
 
 public class ItemCannotBeNullException extends RuntimeException {
 

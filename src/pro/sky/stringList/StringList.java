@@ -1,4 +1,4 @@
-package pro.sky;
+package pro.sky.stringList;
 
 public interface StringList {
 
@@ -29,5 +29,9 @@ public interface StringList {
     void clear();
 
     String[] toArray();
+
+    void printAll();
+
+    String[] getArray();
 
 }
